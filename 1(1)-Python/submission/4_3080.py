@@ -24,16 +24,32 @@ class Trie(list[TrieNode[T]]):
         super().__init__()
         self.append(TrieNode(body=None))
 
-    def push(self, seq: Iterable[T]) -> None:
+    def push(self, seq: Iterable [T]) -> None:
         """
         seq: T의 열 (list[int]일 수도 있고 str일 수도 있고 등등...)
 
         action: trie에 seq을 저장하기
         """
-        # 구현하세요!
-        pass
+        node = 0
+        for ch in seq:
+            found = False
+            for child in self[node].children:
+                if self[child].body == ch:
+                    node = child
+                    found = True
+                    break
 
-    # 구현하세요!
+            if not found:
+                new_node_index = self.size()
+                self.append(TrieNode(body=ch))
+                self[node].children.append(new_node_index)
+                node = new_node_index
+
+        self[node].is_end = True
+    
+    def size(self) -> int:
+        return len(self)
+
 
 
 import sys
@@ -49,8 +65,29 @@ TODO:
 
 
 def main() -> None:
-    # 구현하세요!
-    pass
+    input = sys.stdin.readline
+    N = int(input())
+    names = [input().strip() for _ in range(N)]
+
+    trie = Trie[int]()
+
+    for name in names:
+        trie.push(map(ord, name))  # str -> int로 바꿔서 push
+
+    names.sort()
+
+    def get_common_prefix_len(a: str, b: str) -> int:
+        l = min(len(a), len(b))
+        for i in range(l):
+            if a[i] != b[i]:
+                return i
+        return l
+
+    max_len = 0
+    for i in range(N - 1):
+        max_len = max(max_len, get_common_prefix_len(names[i], names[i + 1]))
+
+    print(max_len)
 
 
 if __name__ == "__main__":

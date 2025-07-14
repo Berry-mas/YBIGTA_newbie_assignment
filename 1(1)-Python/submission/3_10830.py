@@ -46,7 +46,8 @@ class Matrix:
         return self.matrix[key[0]][key[1]]
 
     def __setitem__(self, key: tuple[int, int], value: int) -> None:
-        self.matrix[key[0]][key[1]] = value % self.MOD
+        i, j = key
+        self.matrix[i][j] = value % self.MOD
 
     def __matmul__(self, matrix: Matrix) -> Matrix:
         x, m = self.shape
@@ -63,36 +64,21 @@ class Matrix:
         return result
 
     def __pow__(self, n: int) -> Matrix:
-        if n == 0:
-            return Matrix.eye(self.shape[0])
-        if n == 1:
-            return self.clone()
-    
-        half = self ** (n // 2)
-        result = half.__matmul__(half)
-    
-        if n % 2 == 1:
-            result = result.__matmul__(self)
-    
-        return result
+        assert self.shape[0] == self.shape[1]
+        result = Matrix.eye(self.shape[0])
+        base = self.clone()
 
+        while n > 0:
+            if n % 2 == 1:
+                result = result.__matmul__(base)
+            base = base.__matmul__(base)
+            n //= 2
+
+        return result
 
 
     def __repr__(self) -> str:
-        row_string_list = []
-
-        for row in self.matrix :
-            cell_string_list = []
-
-            for cell in row:
-                cell_string = str(cell)
-                cell_string_list.append(cell_string)
-
-            row_string = " ".join(cell_string_list)
-            row_string_list.append(row_string)
-
-        result = '\n'.join(row_string_list)
-        return result
+        return '\n'.join(' '.join(str(cell % self.MOD) for cell in row) for row in self.matrix)
 
 
 from typing import Callable

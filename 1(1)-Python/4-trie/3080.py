@@ -12,8 +12,29 @@ TODO:
 
 
 def main() -> None:
-    # 구현하세요!
-    pass
+    input = sys.stdin.readline
+    N = int(input())
+    names = [input().strip() for _ in range(N)]
+
+    trie = Trie[int]()
+
+    for name in names:
+        trie.push(map(ord, name))  # str -> int로 바꿔서 push
+
+    names.sort()
+
+    def get_common_prefix_len(a: str, b: str) -> int:
+        l = min(len(a), len(b))
+        for i in range(l):
+            if a[i] != b[i]:
+                return i
+        return l
+
+    max_len = 0
+    for i in range(N - 1):
+        max_len = max(max_len, get_common_prefix_len(names[i], names[i + 1]))
+
+    print(max_len)
 
 
 if __name__ == "__main__":
