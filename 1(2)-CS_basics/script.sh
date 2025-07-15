@@ -50,7 +50,7 @@ done
 # mypy 테스트 실행 및 mypy_log.txt 저장
 ## TODO
 cd ..  
-mypy submission --exclude "(5670)\.py" > mypy_log.txt   # 못 푼 문제 중 mypy 테스트 통과에 실패하는 5670 제외
+mypy submission > mypy_log.txt 
 
 # conda.yml 파일 생성
 ## TODO
