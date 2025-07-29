@@ -116,6 +116,10 @@ class MultiLayerPerceptron(object):
         dW4 = z3.T @ dh4 + 2 * L2_norm * W4 # multiply
         dz3 = dh4 @ W4.T # multiply
 
+        ### CODE HERE ###
+        # 'gradient 계산하는 과정'을 참고하여 gradient 계산
+        # dh3, db3, dW3, dz2, dh2, db2, dW2, dz1, dh1, db1, dW1 계산
+
         dh3 = dz3 * (1 - tanh(h3 + h1)**2)
         dW3 = z2.T @ dh3 + 2 * L2_norm * W3
         db3 = np.sum(dh3, axis=0)
@@ -129,10 +133,6 @@ class MultiLayerPerceptron(object):
         dh1 = dz1 * (h1 > 0) + (dh3 * (1 - tanh(h3 + h1)**2))  # ReLU + tanh chain rule
         dW1 = X.T @ dh1 + 2 * L2_norm * W1
         db1 = np.sum(dh1, axis=0)
-        
-        ### CODE HERE ###
-        # 'gradient 계산하는 과정'을 참고하여 gradient 계산
-        # dh3, db3, dW3, dz2, dh2, db2, dW2, dz1, dh1, db1, dW1 계산
        
         ################
         ############################################################
