@@ -39,12 +39,13 @@ class Word2Vec(nn.Module):
         optimizer = Adam(self.parameters(), lr=lr)
         # 구현하세요!
         # 토큰화 및 패딩 제거
-        tokenized = tokenizer(corpus, padding=False, truncation=True, return_tensors="pt").input_ids
+        tokenized = tokenizer(corpus, padding=False, truncation=True).input_ids
         tokenized = [seq for seq in tokenized if len(seq) >= self.window_size * 2 + 1]
 
         for epoch in range(num_epochs):
             total_loss = 0
             for sequence in tokenized:
+                sequence = torch.tensor(sequence)
                 loss = self._train_cbow(sequence, criterion)
                 optimizer.zero_grad()
                 loss.backward()
@@ -72,6 +73,8 @@ class Word2Vec(nn.Module):
 
             logits = self.weight(context_mean)        # (vocab_size,)
             loss += criterion(logits.unsqueeze(0), target.unsqueeze(0))
+
+        return loss / (length - 2 * self.window_size) 
 
 
     def _train_skipgram(

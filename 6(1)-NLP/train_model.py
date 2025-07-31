@@ -34,6 +34,8 @@ if __name__ == "__main__":
     train_loader = DataLoader(dataset["train"], batch_size=batch_size, shuffle=True)
     validation_loader = DataLoader(dataset["validation"], batch_size=batch_size, shuffle=True)
 
+    best_macro = 0.0
+
     # train
     for epoch in tqdm(range(num_epochs)):
         loss_sum = 0
@@ -52,8 +54,9 @@ if __name__ == "__main__":
         labels = []
         with torch.no_grad():
             for data in validation_loader:
-                input_ids = tokenizer(data["verse_text"], padding=True, return_tensors="pt")\
-                    .input_ids.to(device)
+                tokenized = tokenizer(data["verse_text"], padding=True, truncation=True, return_tensors="pt")
+                input_ids = tokenized.input_ids.to(device)
+                input_ids = input_ids.clamp(max=embeddings.shape[0] - 1)
                 logits = model(input_ids)
                 labels += data["label"].tolist()
                 preds += logits.argmax(-1).cpu().tolist()
@@ -62,5 +65,7 @@ if __name__ == "__main__":
         micro = f1_score(labels, preds, average='micro')
         print(f"loss: {loss_sum/len(train_loader):.6f} | macro: {macro:.6f} | micro: {micro:.6f}")
 
-    # save model checkpoint
-    torch.save(model.cpu().state_dict(), "checkpoint.pt")
+        # save model checkpoint
+        if macro > best_macro:
+            best_macro = macro
+            torch.save(model.cpu().state_dict(), "checkpoint.pt")  
